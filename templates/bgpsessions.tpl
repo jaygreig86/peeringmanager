@@ -1,0 +1,149 @@
+<script type="text/javascript">
+$(document).ready(function() {
+    // The page we're working on
+    var div = '#v-pills-bgpsessions';
+    
+   // When the document loads, fadeout any alerts within 8 seconds
+    $(".alert").fadeOut(8000);    
+    
+   $('#show_add_session').click(function() {
+       $('#sessions_add').slideDown("slow");
+   });
+
+   $("#add_session").submit(function(e) {
+        e.preventDefault();
+        var dataString = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "content.php?function=addbgpsession",
+            data: dataString,
+            success: function(msg) {
+                console.log('working: '+msg);
+                load_content(div);
+            },
+            error: function(msg) {
+                console.log('not working '+msg);
+                load_content(div);
+            }
+        });        
+   });
+    $("a[id^=delete]").click(function(e){
+        e.preventDefault();
+        var dataString = $(this).data("sessionid");
+        $.ajax({
+            type: "GET",
+            url: "content.php?function=deletebgpsession&sessionid=" + dataString,
+            success: function(msg) {
+                //$("#ratesucess").html("working");  
+                console.log('working: '+msg);
+                load_content(div);
+            },
+            error: function(msg) {
+                //$("#ratesucess").html("not working ");  
+                console.log('not working '+msg);
+                load_content(div);
+            }
+        });        
+   });   
+});
+</script>
+
+<!-- lets display alerts at the top of the page -->
+
+<div class="row">
+    <center>
+    <div class="col">
+        {foreach from=$alerts key=k item=alert}
+            <div id="alert{$k}" class="alert {$alert.type}" role="alert">
+                {$alert.message}
+            </div>
+        {/foreach}
+    </div>
+    </center>
+</div>
+    
+<!-- Begin main content -->
+
+
+<div class="row"><center><button id="show_add_session" type="button" title="Add New" class="btn btn-primary">Add BGP Session <i class="fa-solid fa-caret-down"></i></button></center></div>
+    <div class="row" id="sessions_add" style="display: none">
+        <form id="add_session" class="row g-3" method="POST" action="_self">
+            <div class="col-md-6">
+              <label for="peerid" class="form-label">ASN</label>
+                <select class="form-control" name="peerid" id="peerid" required>
+                    <option disabled selected value>Select an ASN</option>
+                    {foreach from=$bgppeers key=k item=peer}
+                    <option value="{$peer.peerid}">{$peer.asn} - {$peer.description|truncate:30}</option>
+                    {/foreach}
+                </select>
+            </div>
+            <div class="col-md-6">
+              <label for="routerid" class="form-label">Router</label>
+                <select class="form-control" name="routerid" id="routerid" required>
+                    <option disabled selected value>Select a Router</option>
+                    {foreach from=$routers key=k item=router}
+                    <option value="{$router.routerid}">{$router.hostname}</option>
+                    {/foreach}
+                </select>
+            </div>                
+            <div class="col-md-6">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" class="form-control" id="address" name="address" minlength="7" maxlength="64" required>
+            </div>
+            <div class="col-md-6">
+              <label for="password" class="form-label">Password</label>
+              <input type="text" class="form-control" id="password" name="password" minlength="1" maxlength="80" required>
+            </div>                
+            <div class="col-md-6">
+              <label for="type" class="form-label">Session Type</label>                
+                <select class="form-control" name="type" id="type" required>
+                    <option disabled selected value></option>
+                    <option value="ipv4">IPv4</option>
+                    <option value="ipv6">IPv6</option>
+                </select>
+            </div>
+            <div class="col-md-12">
+            <center>
+              <button type="submit" class="btn btn-success">Add Peer</button>
+            </center>
+            </div>            
+        </form>
+    </div>
+<!-- being list -->
+<table class="table table-striped table-framed order-column" id="primary-table-list">
+    <thead>
+        <tr>
+            <th class="textcenter">ASN</th>
+            <th class="textcenter">Description</th>
+            <th class="textcenter">Type</th>
+            <th class="textcenter">Address</th>
+            <th class="textcenter">Password</th>
+            <th class="textcenter">Router</th>
+            <th class="textcenter"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach from=$bgpsessions key=k item=session}
+            <tr>
+                <td style="padding: 2px">{$session.asn}</td>  
+                <td style="padding: 2px">{$session.description}</td>  
+                <td style="padding: 2px">{$session.type}</td>  
+                <td style="padding: 2px">{$session.address}</td>  
+                <td style="padding: 2px">{$session.password}</td>  
+                <td style="padding: 2px">{$session.hostname}</td>
+                <td style="padding: 2px" align="right">
+                    <!-- Example single danger button -->
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Action
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" id="delete{$session.sessionid}" data-sessionid="{$session.sessionid}" href="#">Delete Session</a></li>
+                      </ul>
+                    </div>     
+                </td> 
+            </tr>
+        {/foreach}
+    </tbody>
+</table>
+

@@ -1,0 +1,23 @@
+body{
+	background: #031627;
+}
+/* set form background colour*/
+form{
+    background: #FFFFFF;
+}
+.login-form-container{
+	border-radius: 10px;
+	padding: 30px;
+}
+
+.left-menu{
+	border-radius: 10px;
+	padding: 30px;
+        background: #FFFFFF;
+}
+
+.tab-content{
+	border-radius: 10px;
+	padding: 30px;
+        background: #FFFFFF;
+}
