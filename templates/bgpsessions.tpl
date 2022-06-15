@@ -1,10 +1,30 @@
 <script type="text/javascript">
+    $(document).ready(function () {
+        let table = $('#bgpsessionslist').DataTable({
+            "dom": '<"row"<"col ms-auto"p><"col"f><"col align-middle"l>><"row"i>t<"row"<"col"p>>',
+            "iDisplayLength": 100,
+            "lengthMenu": [[15, 25, 50, -1], [15, 25, 50, "All"]],
+            "pageLength": 100,
+            "order": [[0, "asc"], [3, "asc"], [2, "asc"]],
+            "search": {
+                "return": true,
+                "search": "{$smarty.get.search}"
+            },
+        });
+        table.on( 'search.dt', function () {
+            let url = new URL(window.location);
+            url.searchParams.set('search', table.search());
+            window.history.pushState(null, '', url.toString());
+        });
+    });
+</script>
+<script type="text/javascript">
 $(document).ready(function() {
     // The page we're working on
     var div = '#v-pills-bgpsessions';
     
    // When the document loads, fadeout any alerts within 8 seconds
-    $(".alert").fadeOut(8000);    
+    //$(".alert").fadeOut(8000);    
     
    $('#show_add_session').click(function() {
        $('#sessions_add').slideDown("slow");
@@ -64,7 +84,6 @@ $(document).ready(function() {
     
 <!-- Begin main content -->
 
-
 <div class="row"><center><button id="show_add_session" type="button" title="Add New" class="btn btn-primary">Add BGP Session <i class="fa-solid fa-caret-down"></i></button></center></div>
     <div class="row" id="sessions_add" style="display: none">
         <form id="add_session" class="row g-3" method="POST" action="_self">
@@ -92,7 +111,7 @@ $(document).ready(function() {
             </div>
             <div class="col-md-6">
               <label for="password" class="form-label">Password</label>
-              <input type="text" class="form-control" id="password" name="password" minlength="1" maxlength="80" required>
+              <input type="text" class="form-control" id="password" name="password" minlength="1" maxlength="80" >
             </div>                
             <div class="col-md-6">
               <label for="type" class="form-label">Session Type</label>                
@@ -109,8 +128,9 @@ $(document).ready(function() {
             </div>            
         </form>
     </div>
-<!-- being list -->
-<table class="table table-striped table-framed order-column" id="primary-table-list">
+<!-- begin list -->
+<row class="mb-3">&nbsp;</row>
+<table class="table table-striped table-framed order-column" id="bgpsessionslist">
     <thead>
         <tr>
             <th class="textcenter">ASN</th>

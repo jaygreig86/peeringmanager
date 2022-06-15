@@ -1,4 +1,24 @@
 <script type="text/javascript">
+    $(document).ready(function () {
+        let table = $('#bgppeerslist').DataTable({
+            "dom": '<"row"<"col ms-auto"p><"col"f><"col align-middle"l>><"row"i>t<"row"<"col"p>>',
+            "iDisplayLength": 100,
+            "lengthMenu": [[15, 25, 50, -1], [15, 25, 50, "All"]],
+            "pageLength": 100,
+            "order": [[0, "asc"], [3, "asc"], [2, "asc"]],
+            "search": {
+                "return": true,
+                "search": "{$smarty.get.search}"
+            },
+        });
+        table.on( 'search.dt', function () {
+            let url = new URL(window.location);
+            url.searchParams.set('search', table.search());
+            window.history.pushState(null, '', url.toString());
+        });
+    });
+</script>
+<script type="text/javascript">
 $(document).ready(function() {
     // The page we're working on
     var div = '#v-pills-bgppeers';
@@ -31,8 +51,7 @@ $(document).ready(function() {
    $("#asn").change(function(){
        var asn = $('#asn').val();
        $.ajax({
-            type: "GET",
-//https://www.peeringdb.com/api/as_set/            
+            type: "GET",          
             url: "https://www.peeringdb.com/api/net?asn__in="+asn,
             headers: {
                 "Authorization" : "Api-Key {$settings.peeringdb_api_key}"
@@ -42,14 +61,14 @@ $(document).ready(function() {
 //                alert(JSON.stringify(msg['data']));
                 $('#import').val(msg['data'][0]['irr_as_set']);
                 $('#description').val(msg['data'][0]['name']);
-                $('#ipv4_limit').val(msg['data'][0]['info_prefixes4']);
-                $('#ipv6_limit').val(msg['data'][0]['info_prefixes6']);
+                $('#ipv4_limit').val(Math.ceil(msg['data'][0]['info_prefixes4']*1.1));
+                $('#ipv6_limit').val(Math.ceil(msg['data'][0]['info_prefixes6']*1.1));
             },
             error: function(msg) {
                 console.log('not working '+msg);
 
             }
-        });        
+        });                  
    });   
     $("a[id^=delete]").click(function(e){
         e.preventDefault();
@@ -123,12 +142,17 @@ $(document).ready(function() {
             </div>            
         </form>
     </div>
-<!-- being list -->
-<table class="table table-striped table-framed order-column" id="primary-table-list">
+<!-- begin list -->
+<row class="mb-3">&nbsp;</row>
+<table class="table table-striped table-framed order-column" id="bgppeerslist">
     <thead>
         <tr>
             <th class="textcenter">ASN</th>
             <th class="textcenter">Description</th>
+            <th class="textcenter">Import</th>
+            <th class="textcenter">Export</th>
+            <th class="textcenter">IPv4 Limit</th>
+            <th class="textcenter">IPv6 Limit</th>
             <th class="textcenter"></th>
         </tr>
     </thead>
@@ -137,6 +161,10 @@ $(document).ready(function() {
             <tr>
                 <td style="padding: 2px">{$peer.asn}</td>  
                 <td style="padding: 2px">{$peer.description}</td>  
+                <td style="padding: 2px">{$peer.import}</td>  
+                <td style="padding: 2px">{$peer.export}</td>  
+                <td style="padding: 2px">{$peer.ipv4_limit}</td>  
+                <td style="padding: 2px">{$peer.ipv6_limit}</td>  
                 <td style="padding: 2px" align="right">
                     <!-- Example single danger button -->
                     <div class="btn-group">

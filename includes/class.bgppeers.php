@@ -20,7 +20,7 @@ class bgppeers extends peermanager {
     private function getPeers()
     {
         $pdo = parent::dbconnect();
-        $q = $pdo->prepare("SELECT * FROM ipms_bgppeers");
+        $q = $pdo->prepare("SELECT * FROM ipms_bgppeers ORDER BY description");
         $q->execute();
         $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
         $pdo = null;

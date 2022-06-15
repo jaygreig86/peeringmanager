@@ -100,11 +100,19 @@ if ($peermanager->isloggedin){
             $routers->deleteRouter();
             break;        
         
+        case "viewlogs":
+            $peermanager->getLogs();
+            $peermanager->assigns('logs', $peermanager->getLogs());
+            break;
+        
         default:
             $peermanager->outputAdminArea('index.tpl');
             break;
     }
-} exit(0);
+} else {
+    echo '<meta http-equiv="Refresh" content="0;/index.php">';
+}
+exit(0);
 
 
 ?>
