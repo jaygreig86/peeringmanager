@@ -217,6 +217,18 @@ class peermanager extends smarty {
 
             return $resultarray;	
         }        
+        
+        public function getLogs()
+        {
+            $pdo = $this->dbconnect();
+            $q = $pdo->prepare("SELECT logentry,datetime,type
+                    FROM ipms_logs ");
+            $q->execute();
+            $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
+            $pdo = null;
+
+            return $resultarray;
+        }
 
 	function logout()
 	{
