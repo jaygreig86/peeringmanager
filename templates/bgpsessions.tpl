@@ -1,24 +1,4 @@
 <script type="text/javascript">
-    $(document).ready(function () {
-        let table = $('#bgpsessionslist').DataTable({
-            "dom": '<"row"<"col ms-auto"p><"col"f><"col align-middle"l>><"row"i>t<"row"<"col"p>>',
-            "iDisplayLength": 100,
-            "lengthMenu": [[15, 25, 50, -1], [15, 25, 50, "All"]],
-            "pageLength": 100,
-            "order": [[0, "asc"], [3, "asc"], [2, "asc"]],
-            "search": {
-                "return": true,
-                "search": "{$smarty.get.search}"
-            },
-        });
-        table.on( 'search.dt', function () {
-            let url = new URL(window.location);
-            url.searchParams.set('search', table.search());
-            window.history.pushState(null, '', url.toString());
-        });
-    });
-</script>
-<script type="text/javascript">
 $(document).ready(function() {
     // The page we're working on
     var div = '#v-pills-bgpsessions';
@@ -66,6 +46,26 @@ $(document).ready(function() {
         });        
    });   
 });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        let table = $('#bgpsessionslist').DataTable({
+            "dom": '<"row"<"col ms-auto"p><"col"f><"col align-middle"l>><"row"i>t<"row"<"col"p>>',
+            "iDisplayLength": 100,
+            "lengthMenu": [[15, 25, 50, -1], [15, 25, 50, "All"]],
+            "pageLength": 100,
+            "order": [[0, "asc"], [3, "asc"], [2, "asc"]],
+            "search": {
+                "return": true,
+                "search": "{$smarty.get.search}"
+            },
+        });
+        table.on( 'search.dt', function () {
+            let url = new URL(window.location);
+            url.searchParams.set('search', table.search());
+            window.history.pushState(null, '', url.toString());
+        });
+    });
 </script>
 
 <!-- lets display alerts at the top of the page -->
