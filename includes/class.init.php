@@ -222,7 +222,7 @@ class peermanager extends smarty {
         {
             $pdo = $this->dbconnect();
             $q = $pdo->prepare("SELECT logid,logentry,datetime,type,userip,username
-                    FROM ipms_logs LEFT JOIN ipms_users ON ipms_users.userid = ipms_logs.userid ");
+                    FROM ipms_logs LEFT JOIN ipms_users ON ipms_users.userid = ipms_logs.userid WHERE type <> 'login' ");
             $q->execute();
             $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
             $pdo = null;
