@@ -135,7 +135,7 @@ class peermanager extends smarty {
                     $this->db_link = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
                     $this->db_link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 }catch (PDOException $e) {
-                    echo $e->message;
+                    echo $e->getmessage();
                 }
              } 
 		return $this->db_link;
