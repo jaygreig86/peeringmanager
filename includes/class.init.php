@@ -115,7 +115,7 @@ class peermanager extends smarty {
             if (!isset($_SESSION['username'])){
 		//User initially logs in here
                 if ($this->username) {
-                    $this->log_insert("User $this->username Logged in","info");
+                    $this->log_insert("User $this->username Logged in","login");
                 }                
                 $_SESSION['username']=$this->username;
             }else $this->username = $_SESSION['username'];
@@ -221,8 +221,8 @@ class peermanager extends smarty {
         public function getLogs()
         {
             $pdo = $this->dbconnect();
-            $q = $pdo->prepare("SELECT logentry,datetime,type
-                    FROM ipms_logs ");
+            $q = $pdo->prepare("SELECT logid,logentry,datetime,type,userip,username
+                    FROM ipms_logs LEFT JOIN ipms_users ON ipms_users.userid = ipms_logs.userid ");
             $q->execute();
             $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
             $pdo = null;
