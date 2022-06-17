@@ -117,8 +117,8 @@ $(document).ready(function() {
               <label for="type" class="form-label">Session Type</label>                
                 <select class="form-control" name="type" id="type" required>
                     <option disabled selected value></option>
-                    <option value="ipv4">IPv4</option>
-                    <option value="ipv6">IPv6</option>
+                    <option value="peer">Peer</option>
+                    <option value="customer">Customer</option>
                 </select>
             </div>
             <div class="col-md-12">
