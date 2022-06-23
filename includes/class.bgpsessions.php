@@ -70,6 +70,7 @@ class bgpsessions extends peermanager {
         }        
         unset($q);
         $pdo = null;            
+        parent::addTask("delete_session",$this->sessions[$this->sesssionid]['address']);
         parent::log_insert('BGP Session '.$this->sessions[$this->sesssionid]['address'].' deleted',"info",1);
     }  
 }

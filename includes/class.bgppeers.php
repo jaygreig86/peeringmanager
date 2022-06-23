@@ -68,6 +68,7 @@ class bgppeers extends peermanager {
         }
         unset($q);
         $pdo = null;            
+        parent::addTask("delete_peer",$this->peers[$this->peerid]['asn']);
         parent::log_insert('BGP Peer '.$this->peers[$this->peerid]['asn'].' deleted',"info",1);
     }  
 }
