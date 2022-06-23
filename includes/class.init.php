@@ -217,6 +217,20 @@ class peermanager extends smarty {
 
             return $resultarray;	
         }        
+        // Any jobs that need to be performed externally
+        // i.e deleting a peer at a file and router level
+        // will be processed by a cron job
+        public function addTask($job,$data)
+	{
+            $pdo = $this->dbconnect();
+            
+            $q = $pdo->prepare("INSERT INTO ipms_operations (job,data,date) VALUES (:job,:data,now())");
+            $q->bindParam(":job",$job);
+            $q->bindParam(":data",$data);
+            $q->execute();
+            unset($q);
+            $pdo = null;            
+	}        
         
         public function getLogs()
         {
