@@ -25,6 +25,9 @@ class peermanager extends smarty {
             parent::__construct();
             $this->configLoad(dirname(__DIR__).'/configs/global.conf','ipms');
             $_path = $this->getConfigVars('path');
+            // Load settings
+            $this->getSettings();
+            
             $this->requireLogin();
             $this->force_compile = false;
             $this->debugging = false;
@@ -32,8 +35,7 @@ class peermanager extends smarty {
             $this->cache_lifetime = 120;    
             $this->setCompileDir($_path.'/templates_c');     
             
-            // Load settings
-            $this->getSettings();
+
             
             /* are there any errors the user should know about, i.e failed to delete a switch */
             $this->alerts = $this->log_retrieve_alerts();
@@ -70,16 +72,30 @@ class peermanager extends smarty {
 		
 	    if (!isset($_SESSION['username'])){
                 // The user has not yet logged in, we need to process the passed login details.
-                $q = $pdo->prepare("SELECT userid,username,usertype FROM ipms_users where username = :username AND password = MD5(:password)");
-                $q->bindParam(':username', $_REQUEST['username']);
-                $q->bindParam(':password', $_REQUEST['password']);
-                $q->execute();
-                $q->bindColumn(1,$this->userid);
-                $q->bindColumn(2,$this->username);
-                $q->bindColumn(3,$this->usertype);
-                $q->fetch();
-                $pdo=null;
-                unset($q);
+                if ($this->settings['ldap_enabled']){
+                    if ($this->authLDAP($_REQUEST['username'],$_REQUEST['password'])){
+                        $q = $pdo->prepare("SELECT userid,username,usertype FROM ipms_users where username = :username");
+                        $q->bindParam(':username', $_REQUEST['username']);    
+                        $q->execute();
+                        $q->bindColumn(1,$this->userid);
+                        $q->bindColumn(2,$this->username);
+                        $q->bindColumn(3,$this->usertype);
+                        $q->fetch();
+                        $pdo=null;
+                        unset($q);                        
+                    }
+                }else {
+                    $q = $pdo->prepare("SELECT userid,username,usertype FROM ipms_users where username = :username AND password = MD5(:password)");
+                    $q->bindParam(':username', $_REQUEST['username']);
+                    $q->bindParam(':password', $_REQUEST['password']);    
+                    $q->execute();
+                    $q->bindColumn(1,$this->userid);
+                    $q->bindColumn(2,$this->username);
+                    $q->bindColumn(3,$this->usertype);
+                    $q->fetch();
+                    $pdo=null;
+                    unset($q);                            
+                }
             	if (!$this->userid) {
                 	unset($this->username);
                 	unset($q);
@@ -119,6 +135,16 @@ class peermanager extends smarty {
                 }                
                 $_SESSION['username']=$this->username;
             }else $this->username = $_SESSION['username'];
+        }
+        
+        private function authLDAP($username,$password)
+        {
+            $ldap = ldap_connect($this->settings['ldap_server']);
+            if ($bind = ldap_bind($ldap, $this->settings['ldap_domain'].'\\'.$username, $password)) {
+                return 1;
+            } else {
+                return 0;
+            }            
         }
     
 	function dbconnect($database = 'ipms')
