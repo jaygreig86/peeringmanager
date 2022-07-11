@@ -12,7 +12,6 @@ if ($peermanager->isloggedin){
 	
 } else { 
     $peermanager->assign('settings', $peermanager->settings);
-    $peermanager->outputAdminArea('settings.tpl');
     $peermanager->outputAdminArea('login.tpl');
 
 }
