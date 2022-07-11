@@ -11,6 +11,12 @@
             case '#v-pills-bgpsessions':
                 $(div).load('/content.php?function=viewbgpsessions');
                 break;   
+            case '#v-pills-logs':
+                $(div).load('/content.php?function=viewlogs');
+                break;           
+            case '#v-pills-settings':
+                $(div).load('/content.php?function=viewsettings');
+                break;               
         }      
    }
     window.addEventListener('load', () => {
