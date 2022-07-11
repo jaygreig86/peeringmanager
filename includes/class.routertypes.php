@@ -13,7 +13,7 @@ class routertypes extends peermanager {
     function __construct()
     {
        parent::__construct();
-       $this->routertypes = $this->getRouterTypes();
+      $this->getRouterTypes();
     }
     
     private function getRouterTypes()
@@ -23,7 +23,10 @@ class routertypes extends peermanager {
         $q->execute();
         $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
         $pdo = null;
+        foreach ($resultarray as $result) {
+            $this->routertypes[$result['routertypeid']] = $result;
+        }
 
-        return $resultarray;	
+        return;
     }
 }

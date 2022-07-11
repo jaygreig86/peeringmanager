@@ -14,7 +14,7 @@ class bgppeers extends peermanager {
     {
        parent::__construct();
        if ($peerid)$this->peerid = $peerid;
-       $this->peers = $this->getPeers();
+       $this->getPeers();
     }
     
     private function getPeers()
@@ -24,8 +24,11 @@ class bgppeers extends peermanager {
         $q->execute();
         $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
         $pdo = null;
+        foreach ($resultarray as $result) {
+            $this->peers[$result['peerid']] = $result;
+        }
 
-        return $resultarray;	
+        return;
     }
     
     public function addPeer(array $data)

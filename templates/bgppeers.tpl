@@ -43,9 +43,11 @@ $(document).ready(function() {
                 $('#description').val(msg['data'][0]['name']);
                 $('#ipv4_limit').val(Math.ceil(msg['data'][0]['info_prefixes4']*1.1));
                 $('#ipv6_limit').val(Math.ceil(msg['data'][0]['info_prefixes6']*1.1));
+                unlock_fields();
             },
             error: function(msg) {
                 console.log('not working '+msg);
+                unlock_fields();
 
             }
         });                  
@@ -68,6 +70,21 @@ $(document).ready(function() {
             }
         });        
    });   
+   function unlock_fields()
+   {
+       $('#import').prop('disabled', false);
+       $('#description').prop('disabled', false);
+       $('#ipv4_limit').prop('disabled', false);
+       $('#ipv6_limit').prop('disabled', false);
+   }
+   function lock_fields()
+   {
+       $('#import').prop('disabled', true);
+       $('#description').prop('disabled', true);
+       $('#ipv4_limit').prop('disabled', true);
+       $('#ipv6_limit').prop('disabled', true);       
+   }
+   lock_fields();
 });
 </script>
 <script type="text/javascript">
@@ -112,8 +129,12 @@ $(document).ready(function() {
         <form id="add_peer" class="row g-3" method="POST" action="_self">
             <div class="col-md-6">
               <label for="asn" class="form-label">ASN</label>
-              <input type="number" class="form-control" id="asn" name="asn" max="4294967295" min="1" required>
+                <div class="input-group mb-4">
+                  <input type="number" class="form-control" id="asn" name="asn" max="4294967295" min="1" placeholder="Enter an ASN number to start" required aria-describedby="fetchbutton">
+                    <button class="btn btn-success" type="button" id="fetchbutton">Fetch</button>
+                </div>              
             </div>
+
             <div class="col-md-6">
               <label for="description" class="form-label">Description</label>
               <input type="text" class="form-control" id="description" name="description" maxlength="128" minlength="1" required>

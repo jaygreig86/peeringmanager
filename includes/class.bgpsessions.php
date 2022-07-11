@@ -14,7 +14,7 @@ class bgpsessions extends peermanager {
     {
        parent::__construct();
        if ($sessionid)$this->sessionid = $sessionid;
-       $this->sessions = $this->getSessions();
+       $this->getSessions();
     }
     
     private function getSessions()
@@ -26,8 +26,11 @@ class bgpsessions extends peermanager {
         $q->execute();
         $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
         $pdo = null;
+        foreach ($resultarray as $result) {
+            $this->sessions[$result['sessionid']] = $result;
+        }
 
-        return $resultarray;	
+        return;
     }
     
     public function addSession(array $data)
@@ -65,12 +68,12 @@ class bgpsessions extends peermanager {
         }
         catch (PDOException $e)
         {
-            parent::log_insert('Failed to delete session'.$this->sessions[$this->sesssionid]['address'].' '.$e,"Error",1);
+            parent::log_insert('Failed to delete session'.$this->sessions[$this->sessionid]['address'].' '.$e,"Error",1);
             return -1;
         }        
         unset($q);
-        $pdo = null;            
-        parent::addTask("delete_session",$this->sessions[$this->sesssionid]['address']);
-        parent::log_insert('BGP Session '.$this->sessions[$this->sesssionid]['address'].' deleted',"info",1);
+        $pdo = null;      
+        parent::addTask("delete_session",$this->sessions[$this->sessionid]['address']);
+        parent::log_insert('BGP Session '.$this->sessions[$this->sessionid]['address'].' deleted',"info",1);
     }  
 }

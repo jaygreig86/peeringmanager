@@ -14,7 +14,7 @@ class routers extends peermanager {
     {
        parent::__construct();
        if ($routerid)$this->routerid = $routerid;
-       $this->routers = $this->getRouters();
+       $this->getRouters();
     }
     
     private function getRouters()
@@ -24,8 +24,11 @@ class routers extends peermanager {
         $q->execute();
         $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
         $pdo = null;
+        foreach ($resultarray as $result) {
+            $this->routers[$result['routerid']] = $result;
+        }
 
-        return $resultarray;	
+        return;
     }
     
     public function addRouter(string $hostname,int $routertypeid)
