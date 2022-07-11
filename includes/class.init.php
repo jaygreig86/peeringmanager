@@ -64,6 +64,29 @@ class peermanager extends smarty {
 
             
         }
+        
+        public function updateSettings()
+        {
+            $pdo = $this->dbconnect();
+            
+            $q = $pdo->prepare("UPDATE ipms_settings SET ipms_settings.value = :value WHERE ipms_settings.key = :key");
+            try {
+                $pdo->beginTransaction();
+                foreach($this->settings as $key => $value){
+                    $q->bindParam(":key",$key);
+                    $q->bindParam(":value",$value);
+                    $q->execute();
+                }
+                $pdo->commit();
+            } catch (Exception $ex) {
+                $this->log_insert("Settings failed to update - $ex","Error",1);
+                $pdo->rollBack();
+                return;
+            }
+            $this->log_insert("Settings updated","info",1);
+            unset($q);
+            $pdo = null;                   
+        }
 
         private function requireLogin()
         {
