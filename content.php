@@ -102,8 +102,24 @@ if ($peermanager->isloggedin){
         
         case "viewlogs":
             $peermanager->getLogs();
-            $peermanager->assigns('logs', $peermanager->getLogs());
+            $peermanager->assign('logs', $peermanager->getLogs());
+            $peermanager->outputAdminArea('logs.tpl');
             break;
+
+        case "updatesettings":
+            $peermanager->settings = $_POST;
+            $peermanager->updateSettings();
+            break;
+        
+        case "viewsettings":
+            // Lets fetch any alerts that need to be displayed to the user first
+            $peermanager->assign('alerts', $peermanager->alert_notifications);
+            // Now acknowledge them so they don't keep showing after they've been seen
+            $peermanager->log_acknowledge_last_alerts();     
+            
+            $peermanager->assign('settings', $peermanager->settings);
+            $peermanager->outputAdminArea('settings.tpl');
+            break;        
         
         default:
             $peermanager->outputAdminArea('index.tpl');
