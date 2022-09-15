@@ -5,3 +5,5 @@ db_pass =
 db_name = ipms
 path = /var/www/vhosts/peermanager.corp.tld/httpdocs
 bgp_directory = /var/www/vhosts/peermanager.corp.tld/bgp/
+asn = 123456
+exports = MY-IRR-SET
