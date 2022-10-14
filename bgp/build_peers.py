@@ -190,7 +190,7 @@ def build_configuration(peer,router):
 router bgp %s
 neighbor %s remote-as %s
 neighbor %s description %s
-neighbor %s shut
+!neighbor %s shut
 neighbor %s send-community
 neighbor %s maximum-routes %s
 address-family ipv6
@@ -213,7 +213,7 @@ route-map %s-%s-INv6 permit 10
 router bgp %s
 neighbor %s remote-as %s
 neighbor %s description %s
-neighbor %s shut
+!neighbor %s shut
 neighbor %s send-community
 neighbor %s maximum-routes %s
 address-family ipv4
@@ -262,6 +262,7 @@ ip as-path access-list %s source flash:/bgp/%s.aspaths
 """ % (asn,asn,asn,asn,asn,asn)
 
         f = open(configlocation + asn,'w')
+        f.write("conf t")
         f.write(maps)
         f.write(bgppeers)
         f.close()
