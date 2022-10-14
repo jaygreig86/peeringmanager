@@ -74,6 +74,37 @@ class bgppeers extends peermanager {
         $pdo = null;            
         parent::log_insert('BGP Peer AS'.$data['asn'].' added',"info",1);
     }
+
+    public function updatePeer(array $data)
+    {
+        //add peer
+        $pdo = parent::dbconnect();
+        try {
+            $q = $pdo->prepare("UPDATE ipms_bgppeers SET 
+                description = :description, 
+                import = :import,
+                export = :export,
+                ipv4_limit = :ipv4_limit,
+                ipv6_limit = :ipv6_limit
+                WHERE peerid = :peerid");
+            $q->bindParam(":peerid",$this->peerid);
+            $q->bindParam(":description",$data['description']);
+            $q->bindParam(":import",$data['import']);
+            $q->bindParam(":export",$data['export']);
+            $q->bindParam(":ipv4_limit",$data['ipv4_limit']);
+            $q->bindParam(":ipv6_limit",$data['ipv6_limit']);        
+            $q->execute();
+        }
+        catch (PDOException $e)
+        {
+            parent::log_insert('Failed to update peer'.$this->peers[$this->peerid]['asn'].' '.$e,"Error",1);
+            return -1;
+        }        
+        unset($q);
+        $pdo = null;     
+        parent::addTask("update_peer",$this->peerid);        
+        parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' updated',"info",1);
+    }    
     
     public function deletePeer()
     {

@@ -3,6 +3,10 @@ $(document).ready(function() {
     // The page we're working on
     var div = '#v-pills-bgppeers';
     
+    // Handle the info popup
+    document.getElementById("infopopup").addEventListener('show.bs.modal', handleInfoPopup)
+
+    
    // When the document loads, fadeout any alerts within 8 seconds
     $(".alert").fadeOut(8000);    
     
@@ -27,6 +31,27 @@ $(document).ready(function() {
             }
         });        
    });
+   
+   /* Update a BGP Peer in the background */
+   $("#update_peer").submit(function(e) {
+        e.preventDefault();
+        var dataString = $(this).serialize();
+        $('.modal').modal('hide');
+        $.ajax({
+            type: "POST",
+            url: "content.php?function=updatebgppeer",
+            data: dataString,
+            success: function(msg) {
+                console.log('working: '+msg);
+                load_content(div);
+            },
+            error: function(msg) {
+                console.log('not working '+msg);
+                load_content(div);
+            }
+        });        
+   });   
+   
    /* Lets retrieve all the information that we can from peeringdb */
    $("#asn").change(function(){
        var asn = $('#asn').val();
@@ -38,11 +63,12 @@ $(document).ready(function() {
             },
             success: function(msg) {
                 console.log('working: '+JSON.stringify(msg));
-//                alert(JSON.stringify(msg['data']));
-                $('#import').val(msg['data'][0]['irr_as_set']);
-                $('#description').val(msg['data'][0]['name']);
-                $('#ipv4_limit').val(Math.ceil(msg['data'][0]['info_prefixes4']*1.1));
-                $('#ipv6_limit').val(Math.ceil(msg['data'][0]['info_prefixes6']*1.1));
+                if (msg['data'].length){
+                    $('#import').val(msg['data'][0]['irr_as_set']);
+                    $('#description').val(msg['data'][0]['name']);
+                    $('#ipv4_limit').val(Math.ceil(msg['data'][0]['info_prefixes4']*1.1));
+                    $('#ipv6_limit').val(Math.ceil(msg['data'][0]['info_prefixes6']*1.1));
+                }   
                 unlock_fields();
             },
             error: function(msg) {
@@ -52,6 +78,7 @@ $(document).ready(function() {
             }
         });                  
    });   
+   
     $("a[id^=delete]").click(function(e){
         e.preventDefault();
         var dataString = $(this).data("peerid");
@@ -192,6 +219,18 @@ $(document).ready(function() {
                         Action
                       </button>
                       <ul class="dropdown-menu">
+                          <li><a class="infopopup dropdown-item"
+                             data-bs-toggle="modal"
+                             data-bs-target="#infopopup"
+                             data-peerid="{$peer.peerid}"
+                             data-asn="{$peer.asn}" 
+                             data-description="{$peer.description}"
+                             data-import="{$peer.import}"
+                             data-export="{$peer.export}"
+                             data-ipv4_limit="{$peer.ipv4_limit}"
+                             data-ipv6_limit="{$peer.ipv6_limit}"
+                             id="edit{$peer.peerid}"
+                             href="#">Edit Peer</a>
                         <li><a class="dropdown-item" id="delete{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Delete Peer</a></li>
                       </ul>
                     </div>     
@@ -200,3 +239,4 @@ $(document).ready(function() {
         {/foreach}
     </tbody>
 </table>
+{include file="bgppeer-popup.tpl"}

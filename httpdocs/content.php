@@ -62,6 +62,16 @@ if ($peermanager->isloggedin){
                                 'ipv6_limit' => postVar('ipv6_limit')));
             break;        
         
+        case "updatebgppeer":
+            // Process adding bgp peers            
+            $bgppeers = new bgppeers(intval(postVar('peerid')));
+            $bgppeers->updatePeer(array('description' => postVar('description'),
+                                'import' => postVar('import'),
+                                'export' => postVar('export'),
+                                'ipv4_limit' => postVar('ipv4_limit'),
+                                'ipv6_limit' => postVar('ipv6_limit')));
+            break;                
+        
         case "deletebgppeer":
             // Process adding routers   
             $bgppeers = new bgppeers(intval(getVar('peerid')));
@@ -95,10 +105,16 @@ if ($peermanager->isloggedin){
             break;      
 
         case "deletebgpsession":
-            // Process adding routers   
+            // Process deleting a session
             $bgpsessions = new bgpsessions(intval(getVar('sessionid')));
             $bgpsessions->deleteSession();
-            break;        
+            break;       
+
+        case "resetbgpsession":
+            // Process resetting a session
+            $bgpsessions = new bgpsessions(intval(getVar('sessionid')));
+            $bgpsessions->resetSession();
+            break;            
                 
         
         case "viewrouters":
