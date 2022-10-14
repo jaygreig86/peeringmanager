@@ -77,6 +77,12 @@ class bgpsessions extends peermanager {
         parent::log_insert('BGP Session '.$data['address'].' added',"info",1);
     }
     
+    public function resetSession()
+    {
+        parent::addTask("reset_session",$this->sessionid);
+        parent::log_insert('BGP Session '.$this->sessions[$this->sessionid]['address'].' reset initiated',"info",1);
+    }     
+    
     public function deleteSession()
     {
         //delete BGP Session

@@ -27,6 +27,24 @@ $(document).ready(function() {
             }
         });        
    });
+    $("a[id^=reset]").click(function(e){
+        e.preventDefault();
+        var dataString = $(this).data("sessionid");
+        $.ajax({
+            type: "GET",
+            url: "content.php?function=resetbgpsession&sessionid=" + dataString,
+            success: function(msg) {
+                //$("#ratesucess").html("working");  
+                console.log('working: '+msg);
+                load_content(div);
+            },
+            error: function(msg) {
+                //$("#ratesucess").html("not working ");  
+                console.log('not working '+msg);
+                load_content(div);
+            }
+        });        
+   });      
     $("a[id^=delete]").click(function(e){
         e.preventDefault();
         var dataString = $(this).data("sessionid");
@@ -158,6 +176,7 @@ $(document).ready(function() {
                         Action
                       </button>
                       <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" id="reset{$session.sessionid}" data-sessionid="{$session.sessionid}" href="#">Reset Session</a></li>
                         <li><a class="dropdown-item" id="delete{$session.sessionid}" data-sessionid="{$session.sessionid}" href="#">Delete Session</a></li>
                       </ul>
                     </div>     
