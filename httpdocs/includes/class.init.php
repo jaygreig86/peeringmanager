@@ -302,11 +302,12 @@ class peermanager extends smarty {
             $pdo = null;            
 	}        
         
+        /* We only display the last 7 days otherwise this gets really large */
         public function getLogs()
         {
             $pdo = $this->dbconnect();
             $q = $pdo->prepare("SELECT logid,logentry,datetime,type,userip,username
-                    FROM ipms_logs LEFT JOIN ipms_users ON ipms_users.userid = ipms_logs.userid WHERE type <> 'login' ");
+                    FROM ipms_logs LEFT JOIN ipms_users ON ipms_users.userid = ipms_logs.userid WHERE type <> 'login' AND datetime >= now() - INTERVAL 7 day");
             $q->execute();
             $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
             $pdo = null;
