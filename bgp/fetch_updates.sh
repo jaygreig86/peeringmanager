@@ -22,10 +22,38 @@ fi
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 cd ${SCRIPTPATH}/${ROUTER}
+
+# If folder doesn't exist, we need to create it
+if [ $? != 0 ]
+then
+        mkdir ${SCRIPTPATH}/${ROUTER}
+        cd ${SCRIPTPATH}/${ROUTER}
+        if [ $? != 0 ]
+        then
+                echo "Fatal error, cannot change path to ${SCRIPTPATH}/${ROUTER}"
+                exit
+        fi
+fi
+
+# Check if a git repo exists
+/usr/bin/env git rev-parse --is-inside-work-tree
+if [ $? != 0 ]
+then
+        echo "First run, create repo"
+        /usr/bin/env git init -b main
+        /usr/bin/env touch last_run
+        /usr/bin/env git add last_run
+        /usr/bin/env git commit -m "init repo"
+        /usr/bin/env git rev-parse --short HEAD > last_run
+        /usr/bin/env git add last_run
+        /usr/bin/env git commit -m "first hash"
+fi
 /usr/bin/env git pull
+cd ${SCRIPTPATH}
 /usr/bin/env python ${SCRIPTPATH}/build_peers.py ${ROUTER}
 /usr/bin/env python ${SCRIPTPATH}/build_customers.py ${ROUTER}
 /usr/bin/env python ${SCRIPTPATH}/build_filters.py ${ROUTER}
+cd ${SCRIPTPATH}/${ROUTER}
 /usr/bin/env git add -A
 /usr/bin/env git commit -m "updated by cronjob"
 if [ $? == 0 ]
