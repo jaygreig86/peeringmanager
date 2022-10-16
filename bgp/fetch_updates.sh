@@ -50,9 +50,7 @@ then
 fi
 /usr/bin/env git pull
 cd ${SCRIPTPATH}
-/usr/bin/env python ${SCRIPTPATH}/build_peers.py ${ROUTER}
-/usr/bin/env python ${SCRIPTPATH}/build_customers.py ${ROUTER}
-/usr/bin/env python ${SCRIPTPATH}/build_filters.py ${ROUTER}
+/usr/bin/env python ${SCRIPTPATH}/build_all.py ${ROUTER}
 cd ${SCRIPTPATH}/${ROUTER}
 /usr/bin/env git add -A
 /usr/bin/env git commit -m "updated by cronjob"
