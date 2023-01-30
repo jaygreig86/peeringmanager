@@ -118,7 +118,7 @@ class peermanager:
                  con.close()
 
     ############################
-    # Run Build Filters        #
+    # Run Build All Filters    #
     ############################
 
     def build_filters(self,run_on_only = ""):
@@ -630,6 +630,38 @@ class peermanager:
             self.log("info","Built peer configuration for " + asn + " sucessfully")
 
     ############################
+    # Build filters for ASN    #
+    ############################
+
+    def build_filters_for_asn(self,job = None):
+             con = None
+             try:
+                 con = mdb.connect(self.config['ipms']['db_host'], self.config['ipms']['db_user'], self.config['ipms']['db_pass'], self.config['ipms']['db_name'])
+
+                 cur = con.cursor(mdb.cursors.DictCursor)
+
+                 cur.execute("SELECT * FROM ipms_routers")
+
+                 routers = cur.fetchall()
+
+                 for router in routers:
+                     cur.execute("SELECT * FROM ipms_bgppeers WHERE peerid = %d AND peerid IN (SELECT peerid FROM ipms_bgpsessions WHERE routerid = %d)" % (job['data'],router['routerid']))
+                     peers = cur.fetchall()
+                     for peer in peers:
+                         self.build_filter_configuration(peer,router)
+
+             except mdb.Error as e:
+
+                 print("Error %d: %s" % (e.args[0], e.args[1]))
+                 sys.exit(1)
+
+             finally:
+
+                 if con:
+                     con.close()
+
+
+    ############################
     # Reconfigure Peer         #
     ############################
 
@@ -741,6 +773,8 @@ class peermanager:
                       resp = self.reconfigure_peer(job)
                  elif job['job'] == 'reset_session':
                       resp = self.reset_session(job)
+                 elif job['job'] == 'update_filters':
+                      resp = self.build_filters_for_asn(job)
                  if resp == 0:
                       self.update_operation(job)
          except mdb.Error as e:
