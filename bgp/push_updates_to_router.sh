@@ -42,7 +42,7 @@ do
                 	x=${x/.aspaths/};
 			if [[ $(wc -l <$i) -ge 100 ]] # When we refresh we need to leave a long enough gap for larger lists
 			then
-	                	echo "refresh ip as-path access-list $x; bash sleep 60" >> aspath.changes;
+	                	echo "refresh ip as-path access-list $x; bash sleep 180" >> aspath.changes;
 			else
 				echo "refresh ip as-path access-list $x; bash sleep 60" >> aspath.changes;
 			fi
@@ -73,7 +73,7 @@ do
                 	x=${x/./-};
 			if [[ $(wc -l <$i) -ge 100 ]] # When we refresh we need to leave a long enough gap for larger lists
 			then
-                		echo "refresh ip prefix-list $x-in; bash sleep 60" >> ipv4.changes;
+                		echo "refresh ip prefix-list $x-in; bash sleep 180" >> ipv4.changes;
 			else
 				echo "refresh ip prefix-list $x-in; bash sleep 60" >> ipv4.changes;
 			fi
@@ -103,7 +103,7 @@ do
                 	x=${x/./-};
 			if [[ $(wc -l <$i) -ge 100 ]] # When we refresh we need to leave a long enough gap for larger lists
 			then
-	                	echo "refresh ipv6 prefix-list $x-in; bash sleep 60" >> ipv6.changes;
+	                	echo "refresh ipv6 prefix-list $x-in; bash sleep 180" >> ipv6.changes;
 			else
 				echo "refresh ipv6 prefix-list $x-in; bash sleep 60" >> ipv6.changes;
 			fi
