@@ -61,9 +61,9 @@ class bgpsessions extends peermanager {
         try {    
             $q = $pdo->prepare("INSERT INTO ipms_bgpsessions (peerid,address,type,password,routerid) VALUES (:peerid,:address,:type,:password,:routerid)");
             $q->bindParam(":peerid",$data['peerid']);
-            $q->bindParam(":address",$data['address']);
+            $q->bindParam(":address",trim($data['address']));
             $q->bindParam(":type",$data['type']);
-            $q->bindParam(":password",$data['password']);   
+            $q->bindParam(":password",trim($data['password']));   
             $q->bindParam(":routerid",$data['routerid']);   
             $q->execute();
         }
