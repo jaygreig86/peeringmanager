@@ -52,7 +52,7 @@ do
 done
 if [[ "${#as_path_update}" -gt "1" ]]
 then
-        /usr/local/rancid/bin/clogin -x aspath.changes ${ROUTER}
+        /usr/local/rancid/bin/clogin -t 200 -x aspath.changes ${ROUTER}
 fi
 
 echo "ASPath complete. Waiting 10 seconds"
@@ -83,7 +83,7 @@ do
 done
 if [[ "${#v4_prefix_update}" -gt "1" ]]
 then
-        /usr/local/rancid/bin/clogin -x ipv4.changes ${ROUTER}
+        /usr/local/rancid/bin/clogin -t 200 -x ipv4.changes ${ROUTER}
 fi
 
 echo "IPv4 complete. Waiting 10 seconds"
@@ -113,7 +113,7 @@ do
 done
 if [[ "${#v6_prefix_update}" -gt "1" ]]
 then
-        /usr/local/rancid/bin/clogin -x ipv6.changes ${ROUTER}
+        /usr/local/rancid/bin/clogin -t 200 -x ipv6.changes ${ROUTER}
 fi
 echo "IPv6 complete."
 cd ${SCRIPTPATH}
