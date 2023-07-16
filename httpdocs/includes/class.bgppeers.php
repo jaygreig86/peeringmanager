@@ -106,6 +106,12 @@ class bgppeers extends peermanager {
         parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' updated',"info",1);
     }    
     
+    public function buildFilters()
+    {
+        parent::addTask("build_filters",$this->peerid);        
+        parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' build filters called',"info",1);
+    }
+    
     public function deletePeer()
     {
         //delete peer

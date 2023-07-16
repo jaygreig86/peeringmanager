@@ -77,6 +77,12 @@ if ($peermanager->isloggedin){
             $bgppeers = new bgppeers(intval(getVar('peerid')));
             $bgppeers->deletePeer();
             break;         
+        
+        case "buildfilters":
+            // Process adding routers   
+            $bgppeers = new bgppeers(intval(getVar('peerid')));
+            $bgppeers->buildFilters();
+            break;                 
 
         case "viewbgpsessions":
             // Lets fetch any alerts that need to be displayed to the user first
