@@ -106,6 +106,13 @@ class bgppeers extends peermanager {
         parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' updated',"info",1);
     }    
     
+    public function configurePeer()
+    {
+        parent::addTask("update_peer",$this->peerid);  
+        parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' build configuration initiated.',"info",1);
+        
+    }
+    
     public function buildFilters()
     {
         parent::addTask("build_filters",$this->peerid);        

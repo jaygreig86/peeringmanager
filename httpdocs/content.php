@@ -76,7 +76,13 @@ if ($peermanager->isloggedin){
             // Process adding routers   
             $bgppeers = new bgppeers(intval(getVar('peerid')));
             $bgppeers->deletePeer();
-            break;         
+            break;        
+        
+        case "configurebgppeer":
+            // Process adding routers   
+            $bgppeers = new bgppeers(intval(getVar('peerid')));
+            $bgppeers->configurePeer();
+            break;               
         
         case "buildfilters":
             // Process adding routers   
