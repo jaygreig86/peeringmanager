@@ -9,7 +9,7 @@ import os
 import re
 
 class peermanager:
-    
+
     ############################
     # Config Section Start     #
     ############################
@@ -28,7 +28,7 @@ class peermanager:
 
 
     }
-
+    irr = "whois.radb.net"
     ############################
     # Config Section End       #
     ############################
@@ -118,7 +118,7 @@ class peermanager:
                  con.close()
 
     ############################
-    # Run Build All Filters    #
+    # Run Build Filters        #
     ############################
 
     def build_filters(self,run_on_only = "",peerid = ""):
@@ -156,7 +156,6 @@ class peermanager:
              if con:
                  con.close()
              return 0
-
 
     ############################
     # Run Build Customers      #
@@ -255,7 +254,7 @@ class peermanager:
         # details there that we don't need at the moment
         peer_import_raw = peer['import']
         peer_import = re.sub('.*::','',peer_import_raw)
-        
+
         con = None
         try:
              con = mdb.connect(self.config['ipms']['db_host'], self.config['ipms']['db_user'], self.config['ipms']['db_pass'], self.config['ipms']['db_name'])
@@ -410,6 +409,7 @@ class peermanager:
              ActiveV6 = False
              ActivePeer = False
 
+             print("Info: Generating Filters using IRR %s" % (self.irr))
              for row in rows:
                 session_address = row['address'].decode('ascii')
                 if row['type'] == "peer":
@@ -423,7 +423,7 @@ class peermanager:
                 if '.' in session_address and ActiveV4 == False:
                     try:
                         print("Generating IPv4 prefix lists for: %s" % (asn))
-                        cmd = "/usr/bin/env bgpq3 -h rr.ntt.net -A -4 -m 24 -R 24 %s | sed 's/ip prefix-list NN //'|grep -v 'no ip prefix-list NN'> %s%s.ipv4" % (peer_import,configlocation,asn)
+                        cmd = "/usr/bin/env bgpq3 -h %s  -A -4 -m 24 -R 24 %s | sed 's/ip prefix-list NN //'|grep -v 'no ip prefix-list NN'> %s%s.ipv4" % (self.irr,peer_import,configlocation,asn)
                         response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                     except ValueError as err:
                         print("ERROR: %s" % (err))
@@ -432,7 +432,7 @@ class peermanager:
                 if ':' in session_address and ActiveV6 == False:
                     try:
                         print("Generating IPv6 prefix lists for: %s" % (asn))
-                        cmd = "/usr/bin/env bgpq3 -h rr.ntt.net -A -6 -m 48 %s | sed 's/ipv6 prefix-list NN //'|grep -v 'no ipv6 prefix-list NN'> %s%s.ipv6" % (peer_import,configlocation,asn)
+                        cmd = "/usr/bin/env bgpq3 -h %s -A -6 -m 48 %s | sed 's/ipv6 prefix-list NN //'|grep -v 'no ipv6 prefix-list NN'> %s%s.ipv6" % (self.irr,peer_import,configlocation,asn)
                         response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                     except ValueError as err:
                         print("ERROR: %s" %s (err))
@@ -441,7 +441,7 @@ class peermanager:
                 if ActivePeer == False:
                     try:
                         print("Generating AS Path lists for: %s" % (asn))
-                        cmd = "/usr/bin/env bgpq3 -h rr.ntt.net -3 -f %s %s | sed 's/ip as-path access-list NN //'| grep -v 'no ip as-path' | sed 's/(_\[0-9\]+)/_./' > %s%s.aspaths" % (asn.strip("AS"), peer_import,configlocation,asn)
+                        cmd = "/usr/bin/env bgpq3 -h %s -3 -f %s %s | sed 's/ip as-path access-list NN //'| grep -v 'no ip as-path' | sed 's/(_\[0-9\]+)/_./' > %s%s.aspaths" % (self.irr,asn.strip("AS"), peer_import,configlocation,asn)
                         response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                     except ValueError as err:
                         print("ERROR: %s" %s (err))
@@ -635,38 +635,6 @@ class peermanager:
             self.log("info","Built peer configuration for " + asn + " sucessfully")
 
     ############################
-    # Build filters for ASN    #
-    ############################
-
-    def build_filters_for_asn(self,job = None):
-             con = None
-             try:
-                 con = mdb.connect(self.config['ipms']['db_host'], self.config['ipms']['db_user'], self.config['ipms']['db_pass'], self.config['ipms']['db_name'])
-
-                 cur = con.cursor(mdb.cursors.DictCursor)
-
-                 cur.execute("SELECT * FROM ipms_routers")
-
-                 routers = cur.fetchall()
-
-                 for router in routers:
-                     cur.execute("SELECT * FROM ipms_bgppeers WHERE peerid = %d AND peerid IN (SELECT peerid FROM ipms_bgpsessions WHERE routerid = %d)" % (job['data'],router['routerid']))
-                     peers = cur.fetchall()
-                     for peer in peers:
-                         self.build_filter_configuration(peer,router)
-
-             except mdb.Error as e:
-
-                 print("Error %d: %s" % (e.args[0], e.args[1]))
-                 sys.exit(1)
-
-             finally:
-
-                 if con:
-                     con.close()
-
-
-    ############################
     # Reconfigure Peer         #
     ############################
 
@@ -738,6 +706,27 @@ class peermanager:
     # Update Operation         #
     ############################
 
+    def update_operation(self,job):
+         con = None
+         try:
+             con = mdb.connect(self.config['ipms']['db_host'], self.config['ipms']['db_user'], self.config['ipms']['db_pass'], self.config['ipms']['db_name'])
+             cur = con.cursor(mdb.cursors.DictCursor)
+             cur.execute("UPDATE ipms_operations SET status = 'Completed' WHERE opid = %s" % (job['opid']))
+             con.commit()
+         except mdb.Error as e:
+
+             print("Error %d: %s" % (e.args[0], e.args[1]))
+             sys.exit(1)
+
+         finally:
+
+             if con:
+                 con.close()
+
+    ############################
+    # Run Tasks                #
+    ############################
+
     def run_tasks(self):
          con = None
          try:
@@ -770,4 +759,3 @@ class peermanager:
 
              if con:
                  con.close()
-
