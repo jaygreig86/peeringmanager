@@ -651,8 +651,9 @@ class peermanager:
                  elif peer['type'] == "peer":
                      self.build_peer_configuration(peer,router={'hostname':peer['hostname'],'routerid':peer['routerid']})
                  try:
-                     print("Running for %s %s" % (peer['asn'],peer['hostname']))
+                     self.log("Info", "Pushing config changes via clogin for peer AS%s to %s" % (peer['asn'],peer['hostname']))
                      cmd = "/usr/local/rancid/bin/clogin -x %s%s/config/AS%s %s" % (self.config['ipms']['bgp_directory'],peer['hostname'],peer['asn'],peer['hostname'])
+                     self.log("Info", "Command - %s" % (cmd))
                      response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                  except ValueError as err:
                      self.log("Error","Error reconfiguring peer AS%s on %s - %s" % (peer['asn'],peer['hostname'],err))
