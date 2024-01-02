@@ -654,11 +654,16 @@ class peermanager:
                      self.log("Info", "Pushing config changes via clogin for peer AS%s to %s" % (peer['asn'],peer['hostname']))
                      cmd = "/usr/local/rancid/bin/clogin -x %s%s/config/AS%s %s" % (self.config['ipms']['bgp_directory'],peer['hostname'],peer['asn'],peer['hostname'])
                      self.log("Info", "Command - %s" % (cmd))
-                     response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+                     response = subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT)
+                     self.log("Info","Peer AS%s on %s reconfigured" % (peer['asn'],peer['hostname']))
                  except ValueError as err:
                      self.log("Error","Error reconfiguring peer AS%s on %s - %s" % (peer['asn'],peer['hostname'],err))
+                 except subprocess.CalledProcessError as err:
+                     self.log("Error","Error reconfiguring peer AS%s on %s - %s" % (peer['asn'],peer['hostname'],err.output))
+                 except FileNotFoundError as err:
+                     self.log("Error","Error reconfiguring peer AS%s on %s - %s" % (peer['asn'],peer['hostname'],err.strerror))
                  else:
-                     self.log("Info","Peer AS%s on %s reconfigured" % (peer['asn'],peer['hostname']))
+                     self.log("Error","Error reconfiguring peer AS%s on %s - Other Exception" % (peer['asn'],peer['hostname']))
          except mdb.Error as e:
              print("Error %d: %s" % (e.args[0], e.args[1]))
              sys.exit(1)
