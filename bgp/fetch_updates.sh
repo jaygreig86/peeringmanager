@@ -50,6 +50,7 @@ then
 fi
 /usr/bin/env git pull
 cd ${SCRIPTPATH}
+echo "Info: Running build_all.py"
 /usr/bin/env python ${SCRIPTPATH}/build_all.py ${ROUTER}
 cd ${SCRIPTPATH}/${ROUTER}
 /usr/bin/env git add -A

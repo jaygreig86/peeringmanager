@@ -9,7 +9,7 @@ import os
 import re
 
 class peermanager:
-
+    
     ############################
     # Config Section Start     #
     ############################
@@ -254,7 +254,7 @@ class peermanager:
         # details there that we don't need at the moment
         peer_import_raw = peer['import']
         peer_import = re.sub('.*::','',peer_import_raw)
-
+        
         con = None
         try:
              con = mdb.connect(self.config['ipms']['db_host'], self.config['ipms']['db_user'], self.config['ipms']['db_pass'], self.config['ipms']['db_name'])
@@ -408,7 +408,7 @@ class peermanager:
              ActiveV4 = False
              ActiveV6 = False
              ActivePeer = False
-
+             
              print("Info: Generating Filters using IRR %s" % (self.irr))
              for row in rows:
                 session_address = row['address'].decode('ascii')
@@ -423,7 +423,7 @@ class peermanager:
                 if '.' in session_address and ActiveV4 == False:
                     try:
                         print("Generating IPv4 prefix lists for: %s" % (asn))
-                        cmd = "/usr/bin/env bgpq3 -h %s  -A -4 -m 24 -R 24 %s | sed 's/ip prefix-list NN //'|grep -v 'no ip prefix-list NN'> %s%s.ipv4" % (self.irr,peer_import,configlocation,asn)
+                        cmd = "/usr/bin/env bgpq4 -h %s  -A -4 -m 24 -R 24 %s | sed 's/ip prefix-list NN //'|grep -v 'no ip prefix-list NN'> %s%s.ipv4" % (self.irr,peer_import,configlocation,asn)
                         response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                     except ValueError as err:
                         print("ERROR: %s" % (err))
@@ -432,7 +432,7 @@ class peermanager:
                 if ':' in session_address and ActiveV6 == False:
                     try:
                         print("Generating IPv6 prefix lists for: %s" % (asn))
-                        cmd = "/usr/bin/env bgpq3 -h %s -A -6 -m 48 %s | sed 's/ipv6 prefix-list NN //'|grep -v 'no ipv6 prefix-list NN'> %s%s.ipv6" % (self.irr,peer_import,configlocation,asn)
+                        cmd = "/usr/bin/env bgpq4 -h %s -A -6 -m 48 %s | sed 's/ipv6 prefix-list NN //'|grep -v 'no ipv6 prefix-list NN'> %s%s.ipv6" % (self.irr,peer_import,configlocation,asn)
                         response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                     except ValueError as err:
                         print("ERROR: %s" %s (err))
@@ -441,7 +441,7 @@ class peermanager:
                 if ActivePeer == False:
                     try:
                         print("Generating AS Path lists for: %s" % (asn))
-                        cmd = "/usr/bin/env bgpq3 -h %s -3 -f %s %s | sed 's/ip as-path access-list NN //'| grep -v 'no ip as-path' | sed 's/(_\[0-9\]+)/_./' > %s%s.aspaths" % (self.irr,asn.strip("AS"), peer_import,configlocation,asn)
+                        cmd = "/usr/bin/env bgpq4 -h %s -f %s %s | sed 's/ip as-path access-list NN //'| grep -v 'no ip as-path' | sed 's/(_\[0-9\]+)/_./' > %s%s.aspaths" % (self.irr,asn.strip("AS"), peer_import,configlocation,asn)
                         response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                     except ValueError as err:
                         print("ERROR: %s" %s (err))
@@ -665,7 +665,7 @@ class peermanager:
                  else:
                      self.log("Error","Error reconfiguring peer AS%s on %s - Other Exception" % (peer['asn'],peer['hostname']))
          except mdb.Error as e:
-             print("Error %d: %s" % (e.args[0], e.args[1]))
+             self.log("Error", "Error %d: %s" % (e.args[0], e.args[1]))
              sys.exit(1)
 
          finally:
