@@ -3,10 +3,9 @@ $(document).ready(function() {
     // The page we're working on
     var div = '#v-pills-bgppeers';
     
-    // Handle the info popup
+    // Handle the Edit popup
     document.getElementById("infopopup").addEventListener('show.bs.modal', handleInfoPopup)
 
-    
    // When the document loads, fadeout any alerts within 8 seconds
     $(".alert").fadeOut(8000);    
     
@@ -271,7 +270,7 @@ $(document).ready(function() {
                              data-ipv4_limit="{$peer.ipv4_limit}"
                              data-ipv6_limit="{$peer.ipv6_limit}"
                              id="edit{$peer.peerid}"
-                             href="#">Edit Peer</a>
+                             href="#">Edit Peer</a></li>
                              <li><a class="dropdown-item" id="configure{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Build Peer Config</a></li>
                              <li><a class="dropdown-item" id="build{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Build Filters</a></li>
                         <li><a class="dropdown-item" id="delete{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Delete Peer</a></li>
@@ -282,4 +281,4 @@ $(document).ready(function() {
         {/foreach}
     </tbody>
 </table>
-{include file="bgppeer-popup.tpl"}
+{include file="bgppeer-edit-popup.tpl"}
