@@ -5,7 +5,11 @@ $(document).ready(function() {
     
    // When the document loads, fadeout any alerts within 8 seconds
     //$(".alert").fadeOut(8000);    
-    
+   $("#type").change(function(){
+       if ($("#type").val() === 'customer'){
+           $("#send").prop('disabled', false);
+       } else $("#send").prop('disabled', 'disabled');
+   });
    $('#show_add_session').click(function() {
        $('#sessions_add').slideDown("slow");
    });
@@ -139,9 +143,21 @@ $(document).ready(function() {
                     <option value="customer">Customer</option>
                 </select>
             </div>
+            <div class="col-md-6">
+              <label for="send" class="form-label">Announcement Setting</label>                
+                <select class="form-control" name="send" id="send" required disabled>
+                    <option disabled selected value></option>
+                    <option value="default_only">Default Only</option>
+                    <option value="customers_only">Customers Only</option>
+                    <option value="customers_default">Customers + Default</option>
+                    <option value="customers_peers_default">Customers + Peers + Default</option> 
+                    <option value="customers_peers">Customers + Peers</option>                    
+                    <option value="full">Full Table</option>                    
+                </select>
+            </div>                
             <div class="col-md-12">
             <center>
-              <button type="submit" class="btn btn-success">Add Peer</button>
+              <button type="submit" class="btn btn-success">Add Session</button>
             </center>
             </div>            
         </form>
@@ -157,6 +173,7 @@ $(document).ready(function() {
             <th class="textcenter">Address</th>
             <th class="textcenter">Password</th>
             <th class="textcenter">Router</th>
+            <th class="textcenter">Send</th>
             <th class="textcenter"></th>
         </tr>
     </thead>
@@ -169,6 +186,7 @@ $(document).ready(function() {
                 <td style="padding: 2px">{$session.address}</td>  
                 <td style="padding: 2px">{$session.password}</td>  
                 <td style="padding: 2px">{$session.hostname}</td>
+                <td style="padding: 2px">{$session.send}</td>
                 <td style="padding: 2px" align="right">
                     <!-- Example single danger button -->
                     <div class="btn-group">

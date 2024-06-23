@@ -59,12 +59,13 @@ class bgpsessions extends peermanager {
         //add BGP Session
         $pdo = parent::dbconnect();
         try {    
-            $q = $pdo->prepare("INSERT INTO ipms_bgpsessions (peerid,address,type,password,routerid) VALUES (:peerid,:address,:type,:password,:routerid)");
+            $q = $pdo->prepare("INSERT INTO ipms_bgpsessions (peerid,address,type,password,routerid,send) VALUES (:peerid,:address,:type,:password,:routerid,:send)");
             $q->bindParam(":peerid",$data['peerid']);
             $q->bindParam(":address",trim($data['address']));
             $q->bindParam(":type",$data['type']);
             $q->bindParam(":password",trim($data['password']));   
             $q->bindParam(":routerid",$data['routerid']);   
+            $q->bindParam(":send",$data['send']);   
             $q->execute();
         }
         catch (PDOException $e)
