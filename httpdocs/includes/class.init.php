@@ -37,6 +37,7 @@ class peermanager extends smarty {
     private $alerts;
     public $settings = array();             // Array for settings
     public $alert_notifications = array();
+    public $bgp_directory;
         
         function __construct()
         {
@@ -46,6 +47,7 @@ class peermanager extends smarty {
             parent::__construct();
             $this->configLoad(dirname(__DIR__).'/configs/global.conf','ipms');
             $_path = $this->getConfigVars('path');
+            $this->bgp_directory = $this->getConfigVars('bgp_directory');
             // Load settings
             $this->getSettings();
             
