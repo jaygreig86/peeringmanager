@@ -28,12 +28,13 @@
 
 class bgppeers extends peermanager {
     public $peers;
+    public $sessions;
     private $peerid;
         
     function __construct(int $peerid = 0)
     {
        parent::__construct();
-       if ($peerid)$this->peerid = $peerid;
+       if ($peerid){$this->peerid = $peerid;}
        $this->getPeers();
     }
     
@@ -117,6 +118,24 @@ class bgppeers extends peermanager {
     {
         parent::addTask("build_filters",$this->peerid);        
         parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' build filters called',"info",1);
+    }
+    
+    public function getConfiguration()
+    {
+        $pdo = parent::dbconnect();
+        $q = $pdo->prepare("SELECT ipms_bgpsessions.*,asn,description,hostname FROM ipms_bgpsessions 
+                LEFT JOIN ipms_bgppeers ON ipms_bgpsessions.peerid = ipms_bgppeers.peerid
+                LEFT JOIN ipms_routers ON ipms_routers.routerid = ipms_bgpsessions.routerid 
+                WHERE ipms_bgpsessions.peerid = :peerid");
+        $q->bindParam(":peerid",$this->peerid);       
+        $q->execute();
+        $resultarray = $q->fetchAll(PDO::FETCH_ASSOC);
+        $pdo = null;
+        foreach ($resultarray as $result) {
+            $this->sessions[$result['sessionid']] = $result;
+        }
+
+        return;        
     }
     
     public function deletePeer()
