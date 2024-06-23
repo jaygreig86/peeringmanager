@@ -24,7 +24,7 @@ class peermanager:
                     ipaddr.IPNetwork('2001:7f8:17::/48')],
         "LINX1": [ipaddr.IPNetwork('195.66.224.0/21'),
                   ipaddr.IPNetwork('2001:7F8:4::AFD6:1/64')],
-        "PRIVATE": [ipaddr.IPNetwork('92.60.104.0/24')]
+        "PRIVATE": [ipaddr.IPNetwork('92.60.104.0/24'),ipaddr.IPNetwork('45.146.144.31/32'),ipaddr.IPNetwork('45.146.144.32/32')]
 
 
     }
@@ -353,11 +353,13 @@ class peermanager:
                  sys.exit(2)
         if Active is True:
             maps += """
-
+    bash touch /mnt/flash/bgp/%s.ipv4
+    bash touch /mnt/flash/bgp/%s.ipv6
+    bash touch /mnt/flash/bgp/%s.aspaths
     ip prefix-list %s-ipv4-in source flash:/bgp/%s.ipv4
     ipv6 prefix-list %s-ipv6-in source flash:/bgp/%s.ipv6
     ip as-path access-list %s source flash:/bgp/%s.aspaths
-    """ % (asn,asn,asn,asn,asn,asn)
+    """ % (asn,asn,asn,asn,asn,asn,asn,asn,asn)
 
             f = open(configlocation + asn,'w')
             f.write("conf t")
@@ -503,29 +505,34 @@ class peermanager:
     router bgp %s
     neighbor %s remote-as %s
     neighbor %s description %s
-    neighbor %s shut
+    neighbor %s send-community
+    !neighbor %s shut
     address-family ipv6
     neighbor %s activate
-    neighbor %s send-community
     neighbor %s maximum-routes %s
     neighbor %s route-map %s-INv6 in
     neighbor %s route-map %s-OUTv6 out
     """ % (self.config['ipms']['asn'],session_address,asn.strip("AS"),session_address,peer['description'],session_address,session_address,session_address,session_address,peer['ipv6_limit'],session_address,asn,session_address,asn)
 
-                               routemap = """
+                               if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default" or row['send'] == "customers_default" or row['send'] == "customers_only":
+                                   routemap = """
     route-map %s-OUTv6 permit 10
      match community SUPERNETS
     !
     route-map %s-OUTv6 permit 20
      match community CUSTOMER
-    !
+    !""" % (asn,asn)
+                               if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default":
+                                   routemap = """
     route-map %s-OUTv6 permit 30
      match community PEERS
-    !
+    !""" % (asn)
+                               if row['send'] == "full":
+                                   routemap += """
     route-map %s-OUTv6 permit 40
      match community TRANSIT
     !
-    """ % (asn,asn,asn,asn)
+    """ % (asn)
                                routemap += """
     route-map %s-INv6 permit 9
      match as-path %s
@@ -554,28 +561,33 @@ class peermanager:
     router bgp %s
     neighbor %s remote-as %s
     neighbor %s description %s
-    neighbor %s shut
+    neighbor %s send-community
+    !neighbor %s shut
     address-family ipv4
     neighbor %s activate
-    neighbor %s send-community
     neighbor %s maximum-routes %s
     neighbor %s route-map %s-IN in
     neighbor %s route-map %s-OUT out
     """ % (self.config['ipms']['asn'],session_address,asn.strip("AS"),session_address,peer['description'],session_address,session_address,session_address,session_address,peer['ipv4_limit'],session_address,asn,session_address,asn)
-                               routemap = """
+                               if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default" or row['send'] == "customers_default" or row['send'] == "customers_only":
+                                   routemap = """
     route-map %s-OUT permit 10
      match community SUPERNETS
     !
     route-map %s-OUT permit 20
      match community CUSTOMER
-    !
+    !""" % (asn,asn)
+                               if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default":
+                                   routemap = """
     route-map %s-OUT permit 30
      match community PEERS
-    !
+    !""" % (asn)
+                               if row['send'] == "full":
+                                   routemap += """
     route-map %s-OUT permit 40
      match community TRANSIT
     !
-    """ % (asn,asn,asn,asn)
+    """ % (asn)
 
                                routemap += """
     route-map %s-IN permit 9
@@ -596,6 +608,10 @@ class peermanager:
                               # Check whether we already have this route map
                                if routemap not in maps:
                                    maps += routemap
+
+                 if row['send'] == "default_only" or row['send'] == "customers_default" or row['send'] == "customers_peers_default":
+                               bgppeers += """neighbor %s default-originate always
+    """ % (session_address)
 
                  if row['password']:
                                bgppeers += """neighbor %s password %s
@@ -621,13 +637,16 @@ class peermanager:
                  sys.exit(2)
         if Active is True:
             maps += """
-
+    bash touch /mnt/flash/bgp/%s.ipv4
+    bash touch /mnt/flash/bgp/%s.ipv6
+    bash touch /mnt/flash/bgp/%s.aspaths
     ip prefix-list %s-ipv4-in source flash:/bgp/%s.ipv4
     ipv6 prefix-list %s-ipv6-in source flash:/bgp/%s.ipv6
     ip as-path access-list %s source flash:/bgp/%s.aspaths
-    """ % (asn,asn,asn,asn,asn,asn)
+    """ % (asn,asn,asn,asn,asn,asn,asn,asn,asn)
 
             f = open(configlocation + asn,'w')
+            f.write("conf t")
             f.write(maps)
             f.write(bgppeers)
             f.close()
