@@ -55,7 +55,7 @@
                 <td style="padding: 2px">{$log.username}</td>  
                 <td style="padding: 2px">{$log.type}</td>  
                 <td style="padding: 2px">{$log.userip}</td>  
-                <td style="padding: 2px">{$log.logentry|truncate:64:"..":true}</td>
+                <td style="padding: 2px">{$log.logentry}</td>
             </tr>
         {/foreach}
     </tbody>
