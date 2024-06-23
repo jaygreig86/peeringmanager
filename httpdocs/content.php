@@ -44,10 +44,13 @@ if ($peermanager->isloggedin){
             // Now acknowledge them so they don't keep showing after they've been seen
             $peermanager->log_acknowledge_last_alerts();            
             
-            // Output the BGP Peer content page            
+            // Output the BGP Peer content page       
+            $routers = new routers;
+            $peermanager->assign('routers', $routers->routers);            
             $bgppeers = new bgppeers;
             $peermanager->assign('bgppeers', $bgppeers->peers);
             $peermanager->assign('settings', $peermanager->settings);
+            $peermanager->assign('bgp_directory', $peermanager->bgp_directory);
             $peermanager->outputAdminArea('bgppeers.tpl');
             break;
         
@@ -164,6 +167,25 @@ if ($peermanager->isloggedin){
         case "updatesettings":
             $peermanager->settings = $_POST;
             $peermanager->updateSettings();
+            break;
+        
+        case "getconfiguration":
+            header('Content-Type: application/json; charset=utf-8');
+            $bgppeers = new bgppeers(intval(getVar('peerid')));
+            $bgppeers->getConfiguration();
+            $data['ipv4'] = false;
+            $data['ipv6'] = false;
+            $data['type'] = '';
+            $data['peer_information'] = $bgppeers->peers[intval(getVar('peerid'))];
+            foreach ($bgppeers->sessions as $key => $value){
+                if (strstr($value['address'],":")){
+                    $data['ipv6'] = true;
+                } else $data['ipv4'] = true;
+                
+            }
+            $data['data'] = array_values($bgppeers->sessions);
+            print(json_encode($data));
+            
             break;
         
         case "viewsettings":
