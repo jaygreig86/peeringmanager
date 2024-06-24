@@ -114,7 +114,7 @@ $(document).ready(function() {
                 <select class="form-control" name="peerid" id="peerid" required>
                     <option disabled selected value>Select an ASN</option>
                     {foreach from=$bgppeers key=k item=peer}
-                    <option value="{$peer.peerid}">{$peer.asn} - {$peer.description|truncate:30}</option>
+                    <option value="{$peer.peerid}">{$peer.description|truncate:30} - {$peer.asn}</option>
                     {/foreach}
                 </select>
             </div>
