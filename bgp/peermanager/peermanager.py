@@ -513,9 +513,9 @@ class peermanager:
     neighbor %s route-map %s-INv6 in
     neighbor %s route-map %s-OUTv6 out
     """ % (self.config['ipms']['asn'],session_address,asn.strip("AS"),session_address,peer['description'],session_address,session_address,session_address,session_address,peer['ipv6_limit'],session_address,asn,session_address,asn)
-
+                               routemap = ""
                                if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default" or row['send'] == "customers_default" or row['send'] == "customers_only":
-                                   routemap = """
+                                   routemap += """
     route-map %s-OUTv6 permit 10
      match community SUPERNETS
     !
@@ -523,7 +523,7 @@ class peermanager:
      match community CUSTOMER
     !""" % (asn,asn)
                                if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default":
-                                   routemap = """
+                                   routemap += """
     route-map %s-OUTv6 permit 30
      match community PEERS
     !""" % (asn)
@@ -569,8 +569,9 @@ class peermanager:
     neighbor %s route-map %s-IN in
     neighbor %s route-map %s-OUT out
     """ % (self.config['ipms']['asn'],session_address,asn.strip("AS"),session_address,peer['description'],session_address,session_address,session_address,session_address,peer['ipv4_limit'],session_address,asn,session_address,asn)
+                               routemap = ""
                                if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default" or row['send'] == "customers_default" or row['send'] == "customers_only":
-                                   routemap = """
+                                   routemap += """
     route-map %s-OUT permit 10
      match community SUPERNETS
     !
@@ -578,7 +579,7 @@ class peermanager:
      match community CUSTOMER
     !""" % (asn,asn)
                                if row['send'] == "full" or row['send'] == "customers_peers" or row['send'] == "customers_peers_default":
-                                   routemap = """
+                                   routemap += """
     route-map %s-OUT permit 30
      match community PEERS
     !""" % (asn)
