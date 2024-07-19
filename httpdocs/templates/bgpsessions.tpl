@@ -184,7 +184,7 @@ $(document).ready(function() {
                 <td style="padding: 2px">{$session.description}</td>  
                 <td style="padding: 2px">{$session.type}</td>  
                 <td style="padding: 2px">{$session.address}</td>  
-                <td style="padding: 2px">{$session.password}</td>  
+                <td style="padding: 2px;word-break:break-all;">{$session.password}</td>  
                 <td style="padding: 2px">{$session.hostname}</td>
                 <td style="padding: 2px">{$session.send}</td>
                 <td style="padding: 2px" align="right">
