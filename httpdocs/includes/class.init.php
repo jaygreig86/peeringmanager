@@ -185,6 +185,7 @@ class peermanager extends smarty {
         
         private function authLDAP($username,$password)
         {
+            if ($username === "" || $password === "") return 0;
             $ldap = ldap_connect($this->settings['ldap_server']);
             if ($bind = ldap_bind($ldap, $this->settings['ldap_domain'].'\\'.$username, $password)) {
                 return 1;
