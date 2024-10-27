@@ -116,6 +116,7 @@ if ($peermanager->isloggedin){
                                 'address' => postVar('address'),
                                 'password' => postVar('password'),
                                 'type' => postVar('type'),
+                                'send' => postVar('send'),
                                 'routerid' => postVar('routerid')));
             break;      
 

@@ -75,7 +75,7 @@ class bgpsessions extends peermanager {
         }
         unset($q);
         $pdo = null;            
-        parent::log_insert('BGP Session '.$data['address'].' added',"info",1);
+        parent::log_insert('BGP Session '.$data['address'].' with '.$data['send'].' added',"info",1);
     }
     
     public function resetSession()
