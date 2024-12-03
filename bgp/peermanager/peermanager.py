@@ -750,6 +750,68 @@ class peermanager:
                  con.close()
 
     ############################
+    # Push Filters             #
+    ############################
+
+    def push_filters(self,peerid = ""):
+         con = None
+         try:
+             con = mdb.connect(self.config['ipms']['db_host'], self.config['ipms']['db_user'], self.config['ipms']['db_pass'], self.config['ipms']['db_name'])
+
+             cur = con.cursor(mdb.cursors.DictCursor)
+
+             cur.execute("SELECT asn,hostname FROM ipms_bgpsessions LEFT JOIN ipms_routers ON ipms_bgpsessions.routerid = ipms_routers.routerid LEFT JOIN ipms_bgppeers ON ipms_bgppeers.peerid = ipms_bgpsessions.peerid WHERE ipms_bgpsessions.peerid = %s" % (peerid))
+
+             dataset = cur.fetchall()
+
+             for data in dataset:
+                  asn = "AS" + str(data['asn'])
+                  files = self.config['ipms']['bgp_directory'] + data['hostname'] + '/config/' + asn + ".*"
+                  
+                  # Push the filter files to the router
+                  try:
+                      self.log("Info","SSH Copying files %s" % (files))
+                      cmd = "/usr/bin/scp %s rancid@%s:/mnt/flash/bgp/" % (files,data['hostname'])
+                      response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+                      self.log("Info","SSH Copying successful")
+                  except ValueError as err:
+                      self.log("Error","Error copy files for peer AS%s on %s - %s" % (data['asn'],data['hostname'],err))
+                  except subprocess.CalledProcessError as err:
+                      self.log("Error","Error copy files for peer AS%s on %s - %s" % (data['asn'],data['hostname'],err.output))
+                  except FileNotFoundError as err:
+                      self.log("Error","Error copy files for peer AS%s on %s - %s" % (data['asn'],data['hostname'],err.strerror))
+
+                  # Need to refresh the filters
+                  try:
+                      self.log("Info","Refreshing IPv4 Filters %s" % (files))
+                      cmd = "/usr/local/rancid/bin/clogin -c 'refresh ip prefix-list %s-ipv4-in' %s" % (asn,data['hostname'])
+                      response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+                      self.log("Info","IPv4 Filter refresh successful")
+                      self.log("Info","Refreshing IPv4 Filters %s" % (files))
+                      cmd = "/usr/local/rancid/bin/clogin -c 'refresh ip prefix-list %s-ipv6-in' %s" % (asn,data['hostname'])
+                      response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+                      self.log("Info","IPv6 Filter refresh successful")
+                      self.log("Info","Refreshing AS Path Filters %s" % (files))
+                      cmd = "/usr/local/rancid/bin/clogin -c 'refresh ip as-path access-list %s' %s" % (asn,data['hostname'])
+                      response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+                      self.log("Info","AS Path Filter refresh successful")
+                  except ValueError as err:
+                      self.log("Error","Error refreshing filters for peer AS%s on %s - %s" % (data['asn'],data['hostname'],err))
+                  except subprocess.CalledProcessError as err:
+                      self.log("Error","Error refreshing filters for peer AS%s on %s - %s" % (data['asn'],data['hostname'],err.output))
+                  except FileNotFoundError as err:
+                      self.log("Error","Error refreshing filters for peer AS%s on %s - %s" % (data['asn'],data['hostname'],err.strerror))
+         except mdb.Error as e:
+
+             print("Error %d: %s" % (e.args[0], e.args[1]))
+             sys.exit(1)
+
+         finally:
+
+             if con:
+                 con.close()
+
+    ############################
     # Run Tasks                #
     ############################
 
@@ -774,6 +836,8 @@ class peermanager:
                       resp = self.reset_session(job)
                  elif job['job'] == 'build_filters':
                       resp = self.build_filters("",job['data'])
+                 elif job['job'] == 'push_filters':
+                      resp = self.push_filters(job['data'])
                  if resp == 0:
                       self.update_operation(job)
          except mdb.Error as e:
