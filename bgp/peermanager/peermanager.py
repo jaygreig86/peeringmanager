@@ -682,8 +682,7 @@ class peermanager:
                      self.log("Error","Error reconfiguring peer AS%s on %s - %s" % (peer['asn'],peer['hostname'],err.output))
                  except FileNotFoundError as err:
                      self.log("Error","Error reconfiguring peer AS%s on %s - %s" % (peer['asn'],peer['hostname'],err.strerror))
-                 else:
-                     self.log("Error","Error reconfiguring peer AS%s on %s - Other Exception" % (peer['asn'],peer['hostname']))
+
          except mdb.Error as e:
              self.log("Error", "Error %d: %s" % (e.args[0], e.args[1]))
              sys.exit(1)
@@ -810,6 +809,7 @@ class peermanager:
 
              if con:
                  con.close()
+             return 0
 
     ############################
     # Run Tasks                #
