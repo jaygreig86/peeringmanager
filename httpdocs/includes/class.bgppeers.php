@@ -104,21 +104,27 @@ class bgppeers extends peermanager {
         unset($q);
         $pdo = null;     
         parent::addTask("update_peer",$this->peerid);        
-        parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' updated',"info",1);
+        parent::log_insert('BGP Peer AS'.$this->peers[$this->peerid]['asn'].' updated',"info",1);
     }    
     
     public function configurePeer()
     {
         parent::addTask("update_peer",$this->peerid);  
-        parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' build configuration initiated.',"info",1);
+        parent::log_insert('BGP Peer AS'.$this->peers[$this->peerid]['asn'].' build configuration initiated.',"info",1);
         
     }
     
     public function buildFilters()
     {
         parent::addTask("build_filters",$this->peerid);        
-        parent::log_insert('BGP Peer  AS'.$this->peers[$this->peerid]['asn'].' build filters called',"info",1);
+        parent::log_insert('BGP Peer AS'.$this->peers[$this->peerid]['asn'].' build filters called',"info",1);
     }
+    
+    public function pushFilters()
+    {
+        parent::addTask("push_filters",$this->peerid);        
+        parent::log_insert('BGP Peer AS'.$this->peers[$this->peerid]['asn'].' push filters called',"info",1);
+    }    
     
     public function getConfiguration()
     {

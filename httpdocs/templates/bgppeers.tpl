@@ -137,6 +137,24 @@ $(document).ready(function() {
             }
         });        
    });     
+    $("a[id^=push]").click(function(e){
+        e.preventDefault();
+        var dataString = $(this).data("peerid");
+        $.ajax({
+            type: "GET",
+            url: "content.php?function=pushfilters&peerid=" + dataString,
+            success: function(msg) {
+                //$("#ratesucess").html("working");  
+                console.log('working: '+msg);
+                load_content(div);
+            },
+            error: function(msg) {
+                //$("#ratesucess").html("not working ");  
+                console.log('not working '+msg);
+                load_content(div);
+            }
+        });        
+   });        
    function unlock_fields()
    {
        $('#import').prop('disabled', false);
@@ -271,8 +289,9 @@ $(document).ready(function() {
                              data-ipv6_limit="{$peer.ipv6_limit}"
                              id="edit{$peer.peerid}"
                              href="#">Edit Peer</a></li>
-                             <li><a class="dropdown-item" id="configure{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Build Peer Config</a></li>
                              <li><a class="dropdown-item" id="build{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Build Filters</a></li>
+                             <li><a class="dropdown-item" id="configure{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Build Peer Config</a></li>
+                             <li><a class="dropdown-item" id="push{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Push Filters</a></li>
                         <li><a class="dropdown-item" id="delete{$peer.peerid}" data-peerid="{$peer.peerid}" href="#">Delete Peer</a></li>
                       </ul>
                     </div>     

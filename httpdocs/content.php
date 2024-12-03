@@ -91,7 +91,13 @@ if ($peermanager->isloggedin){
             // Process adding routers   
             $bgppeers = new bgppeers(intval(getVar('peerid')));
             $bgppeers->buildFilters();
-            break;                 
+            break;  
+        
+        case "pushfilters":
+            // Process adding routers   
+            $bgppeers = new bgppeers(intval(getVar('peerid')));
+            $bgppeers->pushFilters();
+            break;              
 
         case "viewbgpsessions":
             // Lets fetch any alerts that need to be displayed to the user first
