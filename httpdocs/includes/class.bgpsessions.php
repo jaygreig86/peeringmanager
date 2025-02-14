@@ -65,7 +65,11 @@ class bgpsessions extends peermanager {
             $q->bindParam(":type",$data['type']);
             $q->bindParam(":password",trim($data['password']));   
             $q->bindParam(":routerid",$data['routerid']);   
-            $q->bindParam(":send",$data['send']);   
+            if (strlen($data['send']) < 1 ){
+                    $q->bindValue(":send", null, PDO::PARAM_STR);
+            } else {
+                $q->bindParam(":send",$data['send']);   
+            }
             $q->execute();
         }
         catch (PDOException $e)
